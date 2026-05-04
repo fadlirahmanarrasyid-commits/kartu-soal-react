@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Kartu Soal & Kisi-Kisi (React Edition)</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #0f172a;
+            --accent-color: #3b82f6;
+            --bg-light: #f8fafc;
+            --text-main: #334155;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-main);
+            background-color: var(--bg-light);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            color: var(--white);
+            padding: 3rem 1rem;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        section {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: var(--secondary-color);
+            border-bottom: 2px solid var(--primary-color);
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .summary-text {
+            font-size: 1.1rem;
+            color: var(--text-main);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .feature-card {
+            background: var(--bg-light);
+            padding: 1.5rem;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 8px;
+            transition: transform 0.2s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-card h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        .badge {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .highlight {
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background: #e2e8f0;
+            margin: 2rem 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="container">
+            <h1 class="hero-title">Aplikasi Kartu Soal & Kisi-Kisi</h1>
+            <p class="hero-subtitle">React Edition • Efisiensi Administrasi Kurikulum Merdeka</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Ringkasan Eksekutif -->
+        <section>
+            <h2>Ringkasan Eksekutif</h2>
+            <p class="summary-text">
+                Aplikasi ini dirancang khusus untuk mempermudah tenaga pendidik dalam mengelola administrasi asesmen
+                sesuai standar <strong>Kurikulum Merdeka</strong>. Fokus utamanya adalah efisiensi, akurasi pedagogis,
+                dan kemudahan output dokumen profesional yang siap digunakan di lingkungan sekolah.
+            </p>
+        </section>
+
+        <!-- Fitur Utama -->
+        <section>
+            <h2>Fitur Utama</h2>
+            <div class="feature-grid">
+
+                <div class="feature-card">
+                    <h3>✨ AI Exam Generator</h3>
+                    <p>Integrasi dengan <strong>AI (Gemini)</strong> untuk menghasilkan soal berkualitas secara otomatis
+                        berdasarkan Tujuan Pembelajaran (TP) yang Anda tentukan.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>📋 Manajemen Kisi-Kisi</h3>
+                    <p>Menghasilkan dokumen Kisi-Kisi Penulisan Soal yang rapi dan sesuai standar secara otomatis
+                        langsung dari database soal.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>📄 Export Profesional</h3>
+                    <p><span class="badge">Excel</span> Output berwarna dengan Kop Surat, Identitas Sekolah lengkap, dan
+                        fitur <em>Wrap Text</em> otomatis.</p>
+                    <p><span class="badge">Word</span> Dokumen siap cetak dengan layout tabel yang presisi dan bersih.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>🖼️ Pratinjau Kartu Soal</h3>
+                    <p>Tampilan estetis per butir soal, lengkap dengan elemen kurikulum seperti <strong>Elemen CP,
+                            ATP,</strong> dan <strong>Strategi Deep Learning</strong>.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>💾 Data Persistence</h3>
+                    <p>Penyimpanan data lokal yang aman. Progres pembuatan soal tidak akan hilang meskipun peramban
+                        (browser) ditutup atau di-refresh.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <section style="background: #eff6ff; border: 1px solid #bfdbfe;">
+            <p style="margin: 0; text-align: center;">
+                Untuk detail teknis dan operasional yang lebih mendalam, silakan tinjau dokumen panduan pengguna.
+            </p>
+        </section>
+
+        <footer>
+            &copy; 2024 Aplikasi Kartu Soal & Kisi-Kisi - React Edition
+        </footer>
+    </div>
+
+</body>
+
+</html>
