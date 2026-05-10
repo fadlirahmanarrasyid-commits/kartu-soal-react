@@ -4,4 +4,5 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  base: './', // Penting agar aplikasi tidak "layar putih" saat dijalankan dari folder
 })

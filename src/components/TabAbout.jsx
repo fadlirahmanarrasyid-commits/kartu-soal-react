@@ -38,6 +38,58 @@ function TabAbout() {
             <a href="https://web.facebook.com/clouds.strife2" target="_blank" rel="noreferrer" className="btn-secondary" style={{ textDecoration: 'none', textAlign: 'center', fontSize: '13px' }}>📘 Facebook</a>
           </div>
 
+          <h3 style={{ borderBottom: '2px solid #eee', paddingBottom: '8px', color: '#333', marginTop: '30px' }}>Log Versi Aplikasi</h3>
+          <div style={{ fontSize: '12px', background: '#f9f9f9', padding: '15px', borderRadius: '8px', border: '1px solid #eee' }}>
+            <div style={{ marginBottom: '10px' }}>
+              <span style={{ fontWeight: 700, color: '#0C447C' }}>v1.6.2 (Latest)</span>
+              <ul style={{ margin: '4px 0', paddingLeft: '20px' }}>
+                <li>Penambahan deskripsi pada <strong>Level Kognitif</strong> (C1-C6) agar lebih mudah dipahami (contoh: Mengingat, Memahami, dll).</li>
+                <li>Pembaruan label level kognitif secara konsisten di seluruh bagian aplikasi (AI, Buat Soal, Kisi-kisi, dan Kartu).</li>
+              </ul>
+            </div>
+            <div style={{ marginBottom: '10px' }}>
+              <span style={{ fontWeight: 700, color: '#666' }}>v1.6.1</span>
+              <ul style={{ margin: '4px 0', paddingLeft: '20px' }}>
+                <li>Penyempurnaan terminologi: <strong>Alur Tujuan Pembelajaran (ATP)</strong> kini menjadi <strong>Tujuan Pembelajaran (TP)</strong>.</li>
+                <li>Input TP pada halaman Generate AI kini menggunakan <strong>Textarea</strong> (mendukung input daftar TP yang banyak sekaligus).</li>
+                <li>Peningkatan Prompt AI untuk mengenali input daftar TP yang spesifik agar hasil kisi-kisi lebih akurat.</li>
+                <li>Penyesuaian label pada <strong>Pratinjau Kartu Soal</strong> dan format ekspor untuk konsistensi kurikulum.</li>
+              </ul>
+            </div>
+            <div style={{ marginBottom: '10px' }}>
+              <span style={{ fontWeight: 700, color: '#666' }}>v1.6.0</span>
+              <ul style={{ margin: '4px 0', paddingLeft: '20px' }}>
+                <li>Integrasi <strong>TinyMCE</strong> sebagai editor teks kaya (bold, italic, list, tabel).</li>
+                <li>Dukungan <strong>Upload Gambar Lokal</strong> langsung ke dalam konten soal.</li>
+                <li>Perbaikan sistem ekspor Excel: Baris baru (paragraf) kini tetap berada dalam <strong>satu sel</strong> yang sama.</li>
+                <li>Penyempurnaan mode Edit: Penggunaan <strong>Radio Button</strong> untuk pemilihan kunci jawaban yang lebih intuitif.</li>
+              </ul>
+            </div>
+            <div style={{ marginBottom: '10px' }}>
+              <span style={{ fontWeight: 700, color: '#666' }}>v1.5.0</span>
+              <ul style={{ margin: '4px 0', paddingLeft: '20px' }}>
+                <li>Integrasi <strong>KaTeX</strong> untuk rendering rumus Matematika profesional.</li>
+                <li>Dukungan rumus Kimia dengan ekstensi <strong>mhchem</strong> (\ce).</li>
+                <li>Implementasi <strong>Resilient JSON Parser</strong> (Nuclear Mode) untuk menangani data LaTeX kompleks dari AI.</li>
+              </ul>
+            </div>
+            <div style={{ marginBottom: '10px' }}>
+              <span style={{ fontWeight: 700, color: '#666' }}>v1.3.2</span>
+              <ul style={{ margin: '4px 0', paddingLeft: '20px' }}>
+                <li>Implementasi export profesional ke Excel dengan dukungan ALT+ENTER.</li>
+                <li>Penyesuaian rasio foto profil ke 3:4 dengan sudut membulat.</li>
+              </ul>
+            </div>
+            <div>
+              <span style={{ fontWeight: 700, color: '#666' }}>v1.0.0</span>
+              <ul style={{ margin: '4px 0', paddingLeft: '20px' }}>
+                <li>Migrasi aplikasi ke React 19 + Vite.</li>
+                <li>Penyempurnaan UI/UX dengan tema professional dark-blue.</li>
+                <li>Dukungan PWA (Progressive Web App).</li>
+              </ul>
+            </div>
+          </div>
+
           <h3 style={{ borderBottom: '2px solid #eee', paddingBottom: '8px', color: '#791F1F', marginTop: '30px' }}>Dukungan & Donasi</h3>
           <p style={{ fontSize: '13px' }}>Jika aplikasi ini bermanfaat bagi Anda, dukung pengembang untuk terus memperbarui fitur-fitur baru melalui:</p>
           <div style={{ 

@@ -1,6 +1,15 @@
 import XLSX from 'xlsx-js-style';
 import { saveAs } from 'file-saver';
 
+const LEVEL_LABELS = {
+  'C1': 'Mengingat (C1)',
+  'C2': 'Memahami (C2)',
+  'C3': 'Menerapkan (C3)',
+  'C4': 'Menganalisis (C4)',
+  'C5': 'Menilai/Evaluasi (C5)',
+  'C6': 'Mencipta (C6)'
+};
+
 function TabKisi({ soalDB, settings }) {
   if (soalDB.length === 0) {
     return (
@@ -275,7 +284,7 @@ function TabKisi({ soalDB, settings }) {
                 <td>{s.tp || '-'}</td>
                 <td>{s.materi || '-'}</td>
                 <td>{s.indikator || '-'}</td>
-                <td className="td-center"><span className="level-badge">{s.level}</span></td>
+                <td className="td-center"><span className="level-badge">{LEVEL_LABELS[s.level] || s.level}</span></td>
                 <td className="td-center">Pilihan Ganda</td>
                 <td className="td-center" style={{ fontWeight: 700, color: '#0C447C' }}>{i + 1}</td>
                 <td className="td-kunci">{s.kunci}</td>

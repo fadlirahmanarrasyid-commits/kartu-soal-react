@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import MathText from './MathText';
 
 function TabDaftar({ soalDB, saveToDB, setEditIdx, setActiveTab, onPrint }) {
   const [filterLevel, setFilterLevel] = useState('');
@@ -23,40 +24,35 @@ function TabDaftar({ soalDB, saveToDB, setEditIdx, setActiveTab, onPrint }) {
 
   const data = filterLevel ? soalDB.filter(s => s.level === filterLevel) : soalDB;
 
+  // Fungsi Pembantu untuk membersihkan HTML agar ramah Excel (Satu Sel)
+  const formatUntukExcel = (html) => {
+    if (!html) return '';
+    let text = html;
+    // Ubah tag pembungkus blok (p, div) menjadi break line (br)
+    // agar Excel tetap menaruhnya dalam satu sel (Alt+Enter style)
+    text = text.replace(/<p>/gi, '').replace(/<\/p>/gi, '<br>');
+    text = text.replace(/<div>/gi, '').replace(/<\/div>/gi, '<br>');
+    // Hapus tag HTML lainnya namun sisakan <br>
+    text = text.replace(/<(?!br\s*\/?)[^>]+>/gi, '');
+    // Bersihkan spasi atau break berlebih di akhir
+    text = text.replace(/(<br>\s*)+$/, '');
+    return text;
+  };
+
   const eksporExcel = () => {
     if (soalDB.length === 0) return alert('Tidak ada data soal untuk diekspor.');
 
     const headers = ['No Urut', 'Soal', 'Jenis Soal', 'Opsi A', 'Opsi B', 'Opsi C', 'Opsi D', 'Opsi E', 'Kunci Jawaban'];
 
-    // Create formal HTML table for Excel
-    // Added CSS for wrap text and same-cell break
     let html = `
       <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
       <head>
         <meta charset="utf-8">
-        <!--[if gte mso 9]>
-        <xml>
-          <x:ExcelWorkbook>
-            <x:ExcelWorksheets>
-              <x:ExcelWorksheet>
-                <x:Name>Bank Soal</x:Name>
-                <x:WorksheetOptions>
-                  <x:DisplayGridlines/>
-                </x:WorksheetOptions>
-              </x:ExcelWorksheet>
-            </x:ExcelWorksheets>
-          </x:ExcelWorkbook>
-        </xml>
-        <![endif]-->
         <style>
-          .text-wrap {
-            mso-number-format: "\\@";
-            white-space: normal;
-            vertical-align: top;
-          }
-          br {
-            mso-data-placement: same-cell;
-          }
+          .text-wrap { mso-number-format: "\\@"; white-space: normal; vertical-align: top; }
+          /* Kunci agar <br> tetap berada dalam satu sel yang sama di Excel */
+          br { mso-data-placement: same-cell; }
+          td { border: 0.5pt solid #ccc; padding: 5px; }
         </style>
       </head>
       <body>
@@ -70,26 +66,27 @@ function TabDaftar({ soalDB, saveToDB, setEditIdx, setActiveTab, onPrint }) {
     `;
 
     soalDB.forEach((s, i) => {
-      const opsiA = s.opsi.find(o => o.huruf === 'A')?.teks || '';
-      const opsiB = s.opsi.find(o => o.huruf === 'B')?.teks || '';
-      const opsiC = s.opsi.find(o => o.huruf === 'C')?.teks || '';
-      const opsiD = s.opsi.find(o => o.huruf === 'D')?.teks || '';
-      const opsiE = s.opsi.find(o => o.huruf === 'E')?.teks || '';
+      // Bersihkan semua konten HTML sebelum dimasukkan ke Excel
+      const opsiA = formatUntukExcel(s.opsi.find(o => o.huruf === 'A')?.teks || '');
+      const opsiB = formatUntukExcel(s.opsi.find(o => o.huruf === 'B')?.teks || '');
+      const opsiC = formatUntukExcel(s.opsi.find(o => o.huruf === 'C')?.teks || '');
+      const opsiD = formatUntukExcel(s.opsi.find(o => o.huruf === 'D')?.teks || '');
+      const opsiE = formatUntukExcel(s.opsi.find(o => o.huruf === 'E')?.teks || '');
 
-      // Combine with special break style for "ALT+ENTER" effect in Excel
-      const stimulusPart = s.stimulus ? s.stimulus + '<br style="mso-data-placement:same-cell;" /><br style="mso-data-placement:same-cell;" />' : '';
-      const content = `${stimulusPart}${s.soal}`;
+      const cleanStimulus = formatUntukExcel(s.stimulus);
+      const cleanSoal = formatUntukExcel(s.soal);
+      const fullSoal = (cleanStimulus ? cleanStimulus + '<br><br>' : '') + cleanSoal;
 
       html += `
         <tr>
           <td style="text-align: center; vertical-align: top;">${i + 1}</td>
-          <td class="text-wrap">${content}</td>
+          <td class="text-wrap">${fullSoal}</td>
           <td style="vertical-align: top;">Pilihan Ganda</td>
-          <td style="vertical-align: top;">${opsiA}</td>
-          <td style="vertical-align: top;">${opsiB}</td>
-          <td style="vertical-align: top;">${opsiC}</td>
-          <td style="vertical-align: top;">${opsiD}</td>
-          <td style="vertical-align: top;">${opsiE}</td>
+          <td class="text-wrap">${opsiA}</td>
+          <td class="text-wrap">${opsiB}</td>
+          <td class="text-wrap">${opsiC}</td>
+          <td class="text-wrap">${opsiD}</td>
+          <td class="text-wrap">${opsiE}</td>
           <td style="text-align: center; font-weight: bold; vertical-align: top;">${s.kunci}</td>
         </tr>
       `;
@@ -169,14 +166,16 @@ function TabDaftar({ soalDB, saveToDB, setEditIdx, setActiveTab, onPrint }) {
 
                 {s.stimulus && (
                   <div style={{ fontSize: 11, color: '#666', background: '#f9f9f9', padding: '6px 8px', borderRadius: 8, marginBottom: 8, fontStyle: 'italic' }}>
-                    {s.stimulus.substring(0, 110)}...
+                    <MathText text={s.stimulus.length > 300 ? s.stimulus.substring(0, 300) + '...' : s.stimulus} />
                   </div>
                 )}
-                <div className="soal-q">{s.soal}</div>
+                <div className="soal-q">
+                  <MathText text={s.soal} />
+                </div>
                 <div className="soal-opsi-mini">
                   {s.opsi.map((o, i) => (
                     <span key={i} className={o.kunci ? 'k' : ''}>
-                      {o.huruf}. {o.teks.substring(0, 45)}{o.teks.length > 45 ? '...' : ''} {i < s.opsi.length - 1 ? ' | ' : ''}
+                      {o.huruf}. <MathText text={o.teks} style={{ display: 'inline' }} /> {i < s.opsi.length - 1 ? ' | ' : ''}
                     </span>
                   ))}
                 </div>

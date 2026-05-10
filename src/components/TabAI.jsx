@@ -1,4 +1,14 @@
 import { useState } from 'react';
+import MathText from './MathText';
+
+const LEVEL_LABELS = {
+  'C1': 'Mengingat (C1)',
+  'C2': 'Memahami (C2)',
+  'C3': 'Menerapkan (C3)',
+  'C4': 'Menganalisis (C4)',
+  'C5': 'Menilai/Evaluasi (C5)',
+  'C6': 'Mencipta (C6)'
+};
 
 function TabAI({ soalDB, saveToDB, showToast }) {
   const [mode, setMode] = useState('api');
@@ -76,14 +86,12 @@ function TabAI({ soalDB, saveToDB, showToast }) {
     
     const combinedPrompt = `Sistem: ${systemPrompt}\n\nUser: ${userPrompt}`;
 
-    // Fungsi internal untuk melakukan request dengan safety settings yang dilonggarkan
     const doFetch = async () => {
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: combinedPrompt }] }],
-          // Mematikan semua filter keamanan agar AI tidak memblokir jawaban teknis
           safetySettings: [
             { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
             { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
@@ -114,7 +122,6 @@ function TabAI({ soalDB, saveToDB, showToast }) {
       return data.candidates[0].content.parts[0].text;
     };
 
-    // Retry logic: Coba sampai 2 kali jika gagal
     try {
       return await doFetch();
     } catch (e) {
@@ -130,19 +137,52 @@ function TabAI({ soalDB, saveToDB, showToast }) {
   };
 
   const extractJSON = (raw) => {
-    const cleaned = raw.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
-    try { return JSON.parse(cleaned); } catch (e1) { }
+    // 1. Bersihkan karakter aneh dan spasi di ujung
+    let cleaned = raw.trim();
+    cleaned = cleaned.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+    
+    const tryParse = (str) => {
+      try { return JSON.parse(str); } catch (e) { return null; }
+    };
+
+    // 2. Cari blok array [ ... ]
     const start = cleaned.indexOf('[');
     const end = cleaned.lastIndexOf(']');
-    if (start !== -1 && end !== -1 && end > start) {
-      try { return JSON.parse(cleaned.substring(start, end + 1)); } catch (e2) { }
+    
+    if (start !== -1 && end !== -1 && end >= start) {
+      const jsonPart = cleaned.substring(start, end + 1);
+      
+      // Strategi 1: Parse Standar
+      try {
+        return JSON.parse(jsonPart);
+      } catch (e1) {
+        // Strategi 2: Nuclear - Gunakan Function Constructor dengan proteksi backslash
+        try {
+          // KUNCI PERBAIKAN: Gandakan semua backslash agar \begin tidak menjadi backspace
+          const escapedPart = jsonPart.replace(/\\/g, '\\\\');
+          const result = new Function(`return ${escapedPart}`)();
+          if (result && typeof result === 'object') {
+            return Array.isArray(result) ? result : [result];
+          }
+        } catch (e2) {
+          console.error("Gagal ekstraksi manual:", e2);
+        }
+      }
     }
-    const start2 = cleaned.indexOf('{');
-    const end2 = cleaned.lastIndexOf('}');
-    if (start2 !== -1 && end2 !== -1 && end2 > start2) {
-      try { return [JSON.parse(cleaned.substring(start2, end2 + 1))]; } catch (e3) { }
+
+    // Coba untuk objek tunggal { ... }
+    const startObj = cleaned.indexOf('{');
+    const endObj = cleaned.lastIndexOf('}');
+    if (startObj !== -1 && endObj !== -1 && endObj >= startObj) {
+      const jsonPart = cleaned.substring(startObj, endObj + 1);
+      try {
+        const escapedPart = jsonPart.replace(/\\/g, '\\\\');
+        const result = new Function(`return ${escapedPart}`)();
+        if (result && typeof result === 'object') return [result];
+      } catch (e) { }
     }
-    throw new Error('Tidak ditemukan JSON yang valid. Pastikan salin seluruh teks dari [ sampai ]');
+
+    throw new Error('Format data tidak valid. Pastikan Anda menyalin mulai dari tanda [ sampai ] secara utuh.');
   };
 
   const buildKisiPrompt = () => {
@@ -152,10 +192,12 @@ Data:
 - Mata Pelajaran: ${mapel}
 - Kelas/Fase: ${kelas}
 - Elemen CP: ${cp}
-- ATP: ${atp}
+- Tujuan Pembelajaran (TP): 
+${atp}
 
 ATURAN WAJIB:
-1. Jumlah TP dalam JSON harus TEPAT ${totalTP} — ini aturan paling penting.
+1. Jika data TP di atas berupa DAFTAR (lebih dari satu), gunakan detail tersebut sebagai acuan utama baris kisi-kisi.
+2. Jumlah TP dalam JSON hasil harus TEPAT ${totalTP} — ini aturan paling penting.
 2. Distribusi tingkat: ${distMudah} TP Mudah (C1-C2), ${distSedang} TP Sedang (C3-C4), ${distMahir} TP Mahir (C5-C6).
 3. Urutkan dari Mudah ke Mahir. Penomoran no dari 1 sampai ${totalTP}.
 4. JANGAN tambahkan field "dl" — Pendekatan DL akan dipilih oleh user.
@@ -167,7 +209,7 @@ Nilai tingkat hanya: Mudah, Sedang, atau Mahir. Nilai level hanya: C1, C2, C3, C
   };
 
   const generateKisiKisi = async () => {
-    if (!mapel || !cp || !atp) { alert('Lengkapi Mata Pelajaran, Elemen CP, dan Alur TP.'); return; }
+    if (!mapel || !cp || !atp) { alert('Lengkapi Mata Pelajaran, Elemen CP, dan Tujuan Pembelajaran (TP).'); return; }
     if (totalTP < 1) { alert('Total TP minimal 1.'); return; }
 
     setLoadingKisi(true); setErrorKisi(''); setAiKisiData([]); setSelectedKisi([]); setAiSoalData([]);
@@ -222,7 +264,10 @@ Konteks:
 
 Aturan:
 1. Setiap soal WAJIB punya stimulus skenario nyata yang relevan dengan mata pelajaran ${mapel}.
-2. Jika materi adalah MATEMATIKA (seperti Matriks), gunakan format penulisan yang rapi. Untuk matriks, gunakan kurung siku dan pastikan angka sejajar, misal: [2  3; 1  4] atau gunakan spasi yang jelas.
+2. PENTING: Untuk ekspresi MATEMATIKA, rumus, atau simbol teknis, WAJIB gunakan format LaTeX dengan pembatas:
+   - Gunakan $ ... $ untuk rumus di dalam baris (inline).
+   - Gunakan $$ ... $$ untuk rumus yang butuh baris baru sendiri (display).
+   - Untuk RUMUS KIMIA, gunakan format \\ce{...} di dalam pembatas tersebut. Contoh: $\\ce{H2O}$ atau $\\ce{C6H12O6 + 6O2 -> 6CO2 + 6H2O}$.
 3. Pertanyaan sesuai level kognitif yang tercantum.
 4. Terapkan Pendekatan DL sesuai yang tertera di setiap TP.
 5. 5 pilihan (A-E), pengecoh masuk akal secara teknis.
@@ -238,7 +283,7 @@ Kembalikan HANYA JSON murni tanpa markdown:
 
     setLoadingSoal(true); setErrorSoal(''); setAiSoalData([]);
 
-    const sysPrompt = `Kamu adalah pembuat soal profesional Kurikulum Merdeka SMK Indonesia dengan pendekatan Deep Learning. Buat soal pilihan ganda HOTs dengan stimulus autentik yang relevan dengan ${mapel}. Jika ada rumus atau matriks, tuliskan dengan format teks yang rapi dan mudah dibaca (gunakan kurung siku, spasi, atau baris baru). Jawab Bahasa Indonesia. Kembalikan HANYA JSON murni tanpa markdown atau teks di luar JSON.`;
+    const sysPrompt = `Kamu adalah pembuat soal profesional Kurikulum Merdeka SMK Indonesia dengan pendekatan Deep Learning. Buat soal pilihan ganda HOTs dengan stimulus autentik yang relevan dengan ${mapel}. PENTING: Selalu gunakan format LaTeX ($...$ atau $$...$$) untuk semua ekspresi matematika, rumus, atau simbol teknis lainnya. Untuk RUMUS KIMIA, gunakan perintah \\ce{...}. Jawab Bahasa Indonesia. Kembalikan HANYA JSON murni tanpa markdown atau teks di luar JSON.`;
     const userPrompt = buildSoalPrompt(selected);
 
     try {
@@ -309,9 +354,8 @@ Kembalikan HANYA JSON murni tanpa markdown:
     }
   };
 
-  // Manual Mode Methods
   const salinKisiKisi = () => {
-    if (!mapel || !cp || !atp) { alert('Lengkapi Mata Pelajaran, Elemen CP, dan Alur TP terlebih dahulu.'); return; }
+    if (!mapel || !cp || !atp) { alert('Lengkapi Mata Pelajaran, Elemen CP, dan Tujuan Pembelajaran (TP) terlebih dahulu.'); return; }
     const prompt = buildKisiPrompt();
     navigator.clipboard.writeText(prompt).then(() => {
       setCopiedKisi(true);
@@ -336,7 +380,7 @@ Kembalikan HANYA JSON murni tanpa markdown:
       setAiSoalData([]);
       showToast(`Kisi-kisi berhasil dimuat (${data.length} TP). Pilih DL per TP lalu centang.`);
     } catch (e) {
-      alert(`Gagal membaca JSON.\nDetail error: ${e.message}`);
+      alert(`Gagal membaca data.\nDetail error: ${e.message}`);
     }
   };
 
@@ -361,13 +405,13 @@ Kembalikan HANYA JSON murni tanpa markdown:
         ...s,
         mapel, kelas, cp, atp,
         dl: s.dl || 'Meaningful Learning',
-        konteks: 'Dunia kerja otomotif / bengkel',
+        konteks: 'Penerapan konsep akademik',
         saved: false
       }));
       setAiSoalData(mappedData);
       showToast(`${mappedData.length} soal berhasil dimuat!`);
     } catch (e) {
-      alert(`Gagal membaca JSON.\nDetail error: ${e.message}`);
+      alert(`Gagal membaca data soal.\nDetail error: ${e.message}`);
     }
   };
 
@@ -394,7 +438,16 @@ Kembalikan HANYA JSON murni tanpa markdown:
             <select value={kelas} onChange={e => setKelas(e.target.value)}><option>X / Fase E</option><option>XI / Fase F</option><option>XII / Fase F</option></select>
           </div>
           <div className="form-group"><label>Elemen Capaian Pembelajaran</label><input type="text" value={cp} onChange={e => setCp(e.target.value)} /></div>
-          <div className="form-group"><label>Alur Tujuan Pembelajaran (ATP)</label><input type="text" value={atp} onChange={e => setAtp(e.target.value)} /></div>
+          <div className="form-group" style={{ gridColumn: 'span 2' }}>
+            <label>Tujuan Pembelajaran (TP) — Bisa satu topik besar atau daftar detail TP</label>
+            <textarea 
+              value={atp} 
+              onChange={e => setAtp(e.target.value)} 
+              placeholder="Contoh: &#10;1. Menganalisis rangkaian seri&#10;2. Menghitung tegangan jatuh&#10;...atau ketik satu topik besar saja"
+              rows="3"
+              style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #AFA9EC', fontFamily: 'inherit', fontSize: '13px' }}
+            ></textarea>
+          </div>
         </div>
 
         <div style={{ background: '#F4F3FE', border: '1px solid #AFA9EC', borderRadius: 10, padding: 14, marginTop: 4 }}>
@@ -548,7 +601,7 @@ Kembalikan HANYA JSON murni tanpa markdown:
                         <td>{item.tp}</td>
                         <td>{item.materi}</td>
                         <td>{item.indikator}</td>
-                        <td className="td-center"><span className="level-badge">{item.level}</span></td>
+                        <td className="td-center"><span className="level-badge">{LEVEL_LABELS[item.level] || item.level}</span></td>
                         <td className="td-center"><span className={tc}>{item.tingkat}</span></td>
                         <td onClick={e => e.stopPropagation()}>
                           <select style={{ fontSize: 11, padding: '4px 6px', border: '1px solid #AFA9EC', borderRadius: 6, background: '#F4F3FE', color: '#534AB7', width: '100%', cursor: 'pointer' }} value={item.dl} onChange={e => handleDLChange(i, e.target.value)}>
@@ -597,19 +650,25 @@ Kembalikan HANYA JSON murni tanpa markdown:
                         <div className="row" style={{ marginBottom: 10 }}>
                           <div className="ai-soal-num">{i + 1}</div>
                           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                            <span className="level-badge">{s.level}</span>
+                            <span className="level-badge">{LEVEL_LABELS[s.level] || s.level}</span>
                             <span className={tc}>{s.tingkat}</span>
                             <span className="pill pill-amber">{(s.materi || '').substring(0, 28)}</span>
                             <span className="pill pill-purple">{s.dl}</span>
                           </div>
                         </div>
-                        {s.stimulus && <div className="ai-soal-stimulus">{s.stimulus}</div>}
-                        <div className="ai-soal-q">{s.soal}</div>
+                        {s.stimulus && (
+                          <div className="ai-soal-stimulus">
+                            <MathText text={s.stimulus} />
+                          </div>
+                        )}
+                        <div className="ai-soal-q">
+                          <MathText text={s.soal} />
+                        </div>
                         <div className="ai-soal-opsi">
                           {(s.opsi || []).map((o, j) => (
                             <div key={j} className={`ai-opsi-item ${o.huruf === s.kunci ? 'k' : ''}`}>
                               <span style={{ minWidth: 16, fontWeight: 700 }}>{o.huruf}.</span>
-                              <span>{o.teks}</span>
+                              <MathText text={o.teks} style={{ display: 'inline' }} />
                             </div>
                           ))}
                         </div>

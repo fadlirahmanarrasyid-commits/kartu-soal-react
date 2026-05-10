@@ -203,7 +203,20 @@ function App() {
     <div className="container">
       <div className="topbar">
         <div>
-          <h1>📚 Aplikasi Kartu Soal — Kurikulum Merdeka</h1>
+          <h1>
+            📚 Aplikasi Kartu Soal — Kurikulum Merdeka
+            <span style={{ 
+              fontSize: '11px', 
+              background: '#E8A838', 
+              color: '#fff', 
+              padding: '2px 8px', 
+              borderRadius: '12px', 
+              marginLeft: '10px',
+              verticalAlign: 'middle',
+              fontWeight: 'bold',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}>v1.6.2</span>
+          </h1>
           <p>SMK · Deep Learning · AI Powered · Offline Ready</p>
         </div>
         <div className="topbar-right">
