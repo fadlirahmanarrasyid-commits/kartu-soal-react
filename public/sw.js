@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kartu-soal-v1';
+const CACHE_NAME = 'kartu-soal-v1.6.2';
 const assets = [
   './',
   './index.html',
