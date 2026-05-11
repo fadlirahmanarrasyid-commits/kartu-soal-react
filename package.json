@@ -10,11 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tinymce/tinymce-react": "^6.3.0",
     "file-saver": "^2.0.5",
     "katex": "^0.16.45",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
+    "react-quill-new": "^3.8.3",
     "xlsx": "^0.18.5",
     "xlsx-js-style": "^1.2.0"
   },

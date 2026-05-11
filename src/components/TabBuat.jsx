@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import MathText from './MathText';
-import { Editor } from '@tinymce/tinymce-react';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 
 const LEVEL_LABELS = {
   'C1': 'Mengingat (C1)',
@@ -11,8 +12,7 @@ const LEVEL_LABELS = {
   'C6': 'Mencipta (C6)'
 };
 
-// SILAKAN ISI API KEY TINYMCE ANDA DI SINI
-const TINY_API_KEY = '0dect7o1g80ilm8dza0y6g91p33g955rr4c455e55z42uprj';
+
 
 function TabBuat({ soalDB, saveToDB, editIdx, setEditIdx, setActiveTab, showToast }) {
   const [formData, setFormData] = useState({
@@ -40,8 +40,6 @@ function TabBuat({ soalDB, saveToDB, editIdx, setEditIdx, setActiveTab, showToas
     ]
   });
 
-  const editorRefStimulus = useRef(null);
-  const editorRefSoal = useRef(null);
   const lastEditIdx = useRef(null);
 
   // LOAD DATA SAAT MODE EDIT
@@ -61,15 +59,6 @@ function TabBuat({ soalDB, saveToDB, editIdx, setEditIdx, setActiveTab, showToas
           opsi: sanitizedOpsi
         });
         
-        const timer = setTimeout(() => {
-          if (editorRefStimulus.current) {
-            editorRefStimulus.current.setContent(dataToEdit.stimulus || '');
-          }
-          if (editorRefSoal.current) {
-            editorRefSoal.current.setContent(dataToEdit.soal || '');
-          }
-        }, 500);
-        return () => clearTimeout(timer);
       }
     }
     if (editIdx === null) {
@@ -103,14 +92,7 @@ function TabBuat({ soalDB, saveToDB, editIdx, setEditIdx, setActiveTab, showToas
   };
 
   const simpanSoal = () => {
-    const stimulusContent = editorRefStimulus.current ? editorRefStimulus.current.getContent() : formData.stimulus;
-    const soalContent = editorRefSoal.current ? editorRefSoal.current.getContent() : formData.soal;
-
-    const finalData = {
-      ...formData,
-      stimulus: stimulusContent,
-      soal: soalContent
-    };
+    const finalData = { ...formData };
 
     if (!finalData.soal || !finalData.tp) {
       alert('Tujuan Pembelajaran dan Butir Soal wajib diisi!');
@@ -144,30 +126,23 @@ function TabBuat({ soalDB, saveToDB, editIdx, setEditIdx, setActiveTab, showToas
     setActiveTab('daftar');
   };
 
-  const tinyMceConfig = {
-    height: 300,
-    menubar: false,
-    plugins: [
-      'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-      'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+  const quillModules = {
+    toolbar: [
+      [{ 'header': [1, 2, 3, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+      [{ 'align': [] }],
+      ['link', 'image'],
+      ['clean']
     ],
-    toolbar: 'undo redo | blocks | ' +
-      'bold italic forecolor | alignleft aligncenter ' +
-      'alignright alignjustify | bullist numlist outdent indent | ' +
-      'image table | removeformat | help',
-    
-    image_title: true,
-    automatic_uploads: true,
-    file_picker_types: 'image',
-    images_upload_handler: (blobInfo) => new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(blobInfo.blob());
-      reader.onload = () => resolve(reader.result);
-    }),
-
-    content_style: 'body { font-family:Inter,Helvetica,Arial,sans-serif; font-size:14px }'
   };
+
+  const quillFormats = [
+    'header', 'bold', 'italic', 'underline', 'strike',
+    'color', 'background', 'list', 'bullet', 'align',
+    'link', 'image'
+  ];
 
   return (
     <div className="panel active print-hide">
@@ -203,22 +178,26 @@ function TabBuat({ soalDB, saveToDB, editIdx, setEditIdx, setActiveTab, showToas
         <div className="form-group">
           <label>Stimulus Soal (Opsional)</label>
           <div className="editor-container" style={{ border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden', marginBottom: '15px' }}>
-            <Editor
-              apiKey={TINY_API_KEY}
-              onInit={(evt, editor) => editorRefStimulus.current = editor}
-              initialValue={formData.stimulus}
-              init={tinyMceConfig}
+            <ReactQuill
+              theme="snow"
+              value={formData.stimulus}
+              onChange={(content) => setFormData(prev => ({ ...prev, stimulus: content }))}
+              modules={quillModules}
+              formats={quillFormats}
+              style={{ height: '200px', marginBottom: '40px' }}
             />
           </div>
         </div>
         <div className="form-group">
           <label>Butir Soal</label>
           <div className="editor-container" style={{ border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden' }}>
-            <Editor
-              apiKey={TINY_API_KEY}
-              onInit={(evt, editor) => editorRefSoal.current = editor}
-              initialValue={formData.soal}
-              init={tinyMceConfig}
+            <ReactQuill
+              theme="snow"
+              value={formData.soal}
+              onChange={(content) => setFormData(prev => ({ ...prev, soal: content }))}
+              modules={quillModules}
+              formats={quillFormats}
+              style={{ height: '250px', marginBottom: '40px' }}
             />
           </div>
         </div>
