@@ -41,7 +41,16 @@ function TabAbout() {
           <h3 style={{ borderBottom: '2px solid #eee', paddingBottom: '8px', color: '#333', marginTop: '30px' }}>Log Versi Aplikasi</h3>
           <div style={{ fontSize: '12px', background: '#f9f9f9', padding: '15px', borderRadius: '8px', border: '1px solid #eee' }}>
             <div style={{ marginBottom: '10px' }}>
-              <span style={{ fontWeight: 700, color: '#0C447C' }}>v1.6.2 (Latest)</span>
+              <span style={{ fontWeight: 700, color: '#0C447C' }}>v1.7.0 (Latest)</span>
+              <ul style={{ margin: '4px 0', paddingLeft: '20px' }}>
+                <li>Migrasi editor dari <strong>TinyMCE</strong> ke <strong>Quill.js</strong> untuk performa yang lebih ringan dan stabil.</li>
+                <li>Penambahan dukungan <strong>Subscript</strong> dan <strong>Superscript</strong> pada toolbar untuk penulisan rumus kimia.</li>
+                <li>Integrasi tombol <strong>Formula</strong> (LaTeX) dengan dukungan penuh untuk rumus kimia kompleks via <code>mhchem</code>.</li>
+                <li>Penyempurnaan sistem sinkronisasi repositori GitHub.</li>
+              </ul>
+            </div>
+            <div style={{ marginBottom: '10px' }}>
+              <span style={{ fontWeight: 700, color: '#666' }}>v1.6.2</span>
               <ul style={{ margin: '4px 0', paddingLeft: '20px' }}>
                 <li>Penambahan deskripsi pada <strong>Level Kognitif</strong> (C1-C6) agar lebih mudah dipahami (contoh: Mengingat, Memahami, dll).</li>
                 <li>Pembaruan label level kognitif secara konsisten di seluruh bagian aplikasi (AI, Buat Soal, Kisi-kisi, dan Kartu).</li>
