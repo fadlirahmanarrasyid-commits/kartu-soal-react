@@ -2,6 +2,10 @@ import { useState, useRef, useEffect } from 'react';
 import MathText from './MathText';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
+import katex from 'katex';
+
+// Required for Quill's formula module
+window.katex = katex;
 
 const LEVEL_LABELS = {
   'C1': 'Mengingat (C1)',
@@ -130,18 +134,19 @@ function TabBuat({ soalDB, saveToDB, editIdx, setEditIdx, setActiveTab, showToas
     toolbar: [
       [{ 'header': [1, 2, 3, false] }],
       ['bold', 'italic', 'underline', 'strike'],
+      [{ 'script': 'sub' }, { 'script': 'super' }],
       [{ 'color': [] }, { 'background': [] }],
       [{ 'list': 'ordered' }, { 'list': 'bullet' }],
       [{ 'align': [] }],
-      ['link', 'image'],
+      ['link', 'image', 'formula'],
       ['clean']
     ],
   };
 
   const quillFormats = [
     'header', 'bold', 'italic', 'underline', 'strike',
-    'color', 'background', 'list', 'bullet', 'align',
-    'link', 'image'
+    'script', 'color', 'background', 'list', 'bullet', 'align',
+    'link', 'image', 'formula'
   ];
 
   return (
