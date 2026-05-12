@@ -13,11 +13,26 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
     <script>
+      let refreshing = false;
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js')
-            .then(reg => console.log('SW Registered'))
+            .then(reg => {
+              console.log('SW Registered');
+              // Check for updates periodically
+              setInterval(() => {
+                reg.update();
+              }, 1000 * 60 * 60); // Every hour
+            })
             .catch(err => console.log('SW Failed', err));
+        });
+
+        // Detect when a new service worker takes over and reload
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (!refreshing) {
+            window.location.reload();
+            refreshing = true;
+          }
         });
       }
     </script>

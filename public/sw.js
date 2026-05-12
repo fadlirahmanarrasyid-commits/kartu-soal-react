@@ -7,6 +7,7 @@ const assets = [
 
 // Install Service Worker
 self.addEventListener('install', (e) => {
+  self.skipWaiting(); // Force update
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(assets);
@@ -23,6 +24,7 @@ self.addEventListener('activate', (e) => {
       );
     })
   );
+  return self.clients.claim(); // Claim clients immediately
 });
 
 // Fetch events
