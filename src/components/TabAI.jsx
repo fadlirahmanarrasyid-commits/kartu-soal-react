@@ -435,7 +435,26 @@ Kembalikan HANYA JSON murni tanpa markdown:
         <div className="form-grid">
           <div className="form-group"><label>Mata Pelajaran</label><input type="text" value={mapel} onChange={e => setMapel(e.target.value)} /></div>
           <div className="form-group"><label>Kelas / Fase</label>
-            <select value={kelas} onChange={e => setKelas(e.target.value)}><option>X / Fase E</option><option>XI / Fase F</option><option>XII / Fase F</option></select>
+            <select value={kelas} onChange={e => setKelas(e.target.value)}>
+              <optgroup label="SD (Sekolah Dasar)">
+                <option>I / Fase A</option>
+                <option>II / Fase A</option>
+                <option>III / Fase B</option>
+                <option>IV / Fase B</option>
+                <option>V / Fase C</option>
+                <option>VI / Fase C</option>
+              </optgroup>
+              <optgroup label="SMP (Sekolah Menengah Pertama)">
+                <option>VII / Fase D</option>
+                <option>VIII / Fase D</option>
+                <option>IX / Fase D</option>
+              </optgroup>
+              <optgroup label="SMA / SMK">
+                <option>X / Fase E</option>
+                <option>XI / Fase F</option>
+                <option>XII / Fase F</option>
+              </optgroup>
+            </select>
           </div>
           <div className="form-group"><label>Elemen Capaian Pembelajaran</label><input type="text" value={cp} onChange={e => setCp(e.target.value)} /></div>
           <div className="form-group" style={{ gridColumn: 'span 2' }}>

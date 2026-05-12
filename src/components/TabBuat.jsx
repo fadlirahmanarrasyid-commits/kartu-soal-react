@@ -157,7 +157,29 @@ function TabBuat({ soalDB, saveToDB, editIdx, setEditIdx, setActiveTab, showToas
         
         <div className="form-grid">
           <div className="form-group"><label>Mata Pelajaran</label><input type="text" name="mapel" value={formData.mapel} onChange={handleInputChange} /></div>
-          <div className="form-group"><label>Kelas / Fase</label><input type="text" name="kelas" value={formData.kelas} onChange={handleInputChange} /></div>
+          <div className="form-group">
+            <label>Kelas / Fase</label>
+            <select name="kelas" value={formData.kelas} onChange={handleInputChange}>
+              <optgroup label="SD (Sekolah Dasar)">
+                <option value="I / Fase A">I / Fase A</option>
+                <option value="II / Fase A">II / Fase A</option>
+                <option value="III / Fase B">III / Fase B</option>
+                <option value="IV / Fase B">IV / Fase B</option>
+                <option value="V / Fase C">V / Fase C</option>
+                <option value="VI / Fase C">VI / Fase C</option>
+              </optgroup>
+              <optgroup label="SMP (Sekolah Menengah Pertama)">
+                <option value="VII / Fase D">VII / Fase D</option>
+                <option value="VIII / Fase D">VIII / Fase D</option>
+                <option value="IX / Fase D">IX / Fase D</option>
+              </optgroup>
+              <optgroup label="SMA / SMK">
+                <option value="X / Fase E">X / Fase E</option>
+                <option value="XI / Fase F">XI / Fase F</option>
+                <option value="XII / Fase F">XII / Fase F</option>
+              </optgroup>
+            </select>
+          </div>
           <div className="form-group"><label>Elemen CP</label><input type="text" name="cp" value={formData.cp} onChange={handleInputChange} /></div>
           <div className="form-group"><label>Tujuan Pembelajaran (TP)</label><input type="text" name="atp" value={formData.atp} onChange={handleInputChange} /></div>
           <div className="form-group"><label>Detail Tujuan Pembelajaran</label><textarea name="tp" value={formData.tp} onChange={handleInputChange}></textarea></div>
