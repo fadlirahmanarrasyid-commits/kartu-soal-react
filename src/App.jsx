@@ -215,7 +215,7 @@ function App() {
               verticalAlign: 'middle',
               fontWeight: 'bold',
               boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-            }}>v1.6.2</span>
+            }}>v1.7.0</span>
           </h1>
           <p>SMK · Deep Learning · AI Powered · Offline Ready</p>
         </div>
